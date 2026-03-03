@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOP Interactive - Conditionnement Bouteilles</title>
+    <title>SOP Interactive - Heineken La Valentine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -21,21 +21,66 @@
             scroll-behavior: smooth;
         }
 
-        /* Animations de flux */
-        @keyframes flowLine {
-            0% { stroke-dashoffset: 100; }
-            100% { stroke-dashoffset: 0; }
+        .node-card {
+            border: 2px solid var(--border-color);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            position: relative;
+            cursor: pointer;
         }
 
-        .flow-path {
-            stroke-dasharray: 10;
-            animation: flowLine 5s linear infinite;
+        .node-card:hover {
+            border-color: var(--heineken-green);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
         }
 
-        @keyframes pulseGreen {
-            0% { box-shadow: 0 0 0 0 rgba(0, 130, 0, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(0, 130, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 130, 0, 0); }
+        .node-number {
+            font-weight: 800;
+            color: var(--heineken-green);
+            opacity: 0.1;
+            font-size: 4rem;
+            position: absolute;
+            top: 0px;
+            right: 15px;
+            pointer-events: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            width: 80%;
+            max-width: 900px;
+            border-radius: 12px;
+            overflow: hidden;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .machine-drawing {
+            background: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-left: 1px solid #edf2f7;
         }
 
         .haccp-pulse {
@@ -48,333 +93,323 @@
             100% { box-shadow: 0 0 0 0 rgba(227, 6, 19, 0); }
         }
 
-        /* Styles des Nodes */
-        .node-card {
-            border: 2px solid var(--border-color);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            background: white;
-            position: relative;
-        }
-
-        .node-card:hover {
-            border-color: var(--heineken-green);
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
-        }
-
-        .node-number {
-            font-weight: 800;
-            color: var(--heineken-green);
-            opacity: 0.2;
-            font-size: 3rem;
+        .btn-close {
             position: absolute;
-            top: 10px;
+            top: 20px;
             right: 20px;
-        }
-
-        /* Modal Overlay */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 40px;
-            border-left: 10px solid var(--heineken-green);
-            width: 50%;
-            border-radius: 8px;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .btn-desc {
-            background: var(--heineken-green);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            transition: all 0.3s;
+            font-size: 2rem;
             cursor: pointer;
-        }
-
-        .btn-desc:hover {
-            background: #006400;
-            letter-spacing: 1px;
-        }
-
-        /* SVG spécifique */
-        .svg-icon {
-            width: 120px;
-            height: 120px;
-            fill: none;
-            stroke: var(--heineken-green);
-            stroke-width: 1.5;
-            margin: 20px auto;
+            color: #718096;
+            z-index: 10;
         }
     </style>
 </head>
 <body>
 
-    <header class="bg-white border-b-4 border-[var(--heineken-green)] py-8 px-12 sticky top-0 z-50 shadow-sm">
+    <header class="bg-white border-b-4 border-[var(--heineken-green)] py-6 px-12 sticky top-0 z-50 shadow-md">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div>
-                <h1 class="text-4xl font-extrabold tracking-tighter text-gray-900 italic">
-                    CONDITIONNEMENT <span class="text-[var(--heineken-green)]">— BOUTEILLES</span>
+                <h1 class="text-3xl font-black tracking-tighter text-gray-900 italic">
+                    LIGNE DE CONDITIONNEMENT <span class="text-[var(--heineken-green)]">BOUTEILLES</span>
                 </h1>
-                <p class="text-gray-500 font-medium mt-1 uppercase tracking-widest text-xs">Schéma de flux haute performance | Lignes G8 & G9</p>
+                <p class="text-gray-500 font-bold mt-1 uppercase tracking-widest text-[10px]">Architecture Industrielle | Groupes G8 & G9 | La Valentine</p>
             </div>
-            <div class="text-right">
-                <span class="block text-2xl font-black text-[var(--heineken-red)]">★ HEINEKEN</span>
-                <span class="text-[10px] text-gray-400 font-bold uppercase">Usine de la Valentine</span>
+            <div class="flex items-center gap-6">
+                <div class="text-right">
+                    <span class="block text-xl font-black text-[var(--heineken-red)]">★ HEINEKEN</span>
+                    <span class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Process Engineering</span>
+                </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto py-16 px-6">
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-
-            <div class="node-card p-8 rounded-2xl">
+    <main class="max-w-7xl mx-auto py-12 px-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <!-- 01: Dépalettisation -->
+            <div class="node-card p-6 rounded-xl" onclick="openModal('modal-depal')">
                 <span class="node-number">01</span>
-                <h2 class="text-xl font-bold mb-4 uppercase tracking-tight">Dépalettisation G8 - G9</h2>
-                <div class="svg-icon">
-                    <svg viewBox="0 0 100 100">
-                        <rect x="20" y="20" width="60" height="60" stroke-dasharray="4 2" />
-                        <path d="M10 80 H90" stroke-width="3" />
-                        <path d="M30 40 L50 20 L70 40" stroke="var(--heineken-red)" />
-                        <circle cx="50" cy="50" r="5" class="animate-ping" fill="var(--heineken-green)" />
+                <h3 class="font-black text-lg mb-2 uppercase">Dépalettisation</h3>
+                <p class="text-xs text-gray-500 leading-relaxed mb-4">Entrée du verre neuf. Déhoussage manuel et retrait des Akilux.</p>
+                <div class="flex items-center justify-center py-4">
+                    <svg width="80" height="80" viewBox="0 0 100 100" fill="none" stroke="var(--heineken-green)" stroke-width="2">
+                        <rect x="20" y="40" width="60" height="40" stroke-dasharray="4 2"/>
+                        <path d="M10 80 H90 M20 40 L50 10 L80 40" stroke="var(--heineken-red)"/>
+                        <rect x="40" y="30" width="20" height="10" fill="var(--heineken-green)" opacity="0.3"/>
                     </svg>
                 </div>
-                <div class="space-y-2 mb-6">
-                    <p class="text-sm font-semibold flex items-center gap-2">
-                        <span class="w-2 h-2 bg-[var(--heineken-green)] rounded-full"></span> Retrait housse & Akilux
-                    </p>
-                </div>
-                <button class="btn-desc" onclick="openModal('desc-depal')">DESCRIPTION</button>
+                <div class="mt-2 text-[10px] font-bold text-[var(--heineken-green)] uppercase tracking-widest">Voir détails →</div>
             </div>
 
-            <div class="node-card p-8 rounded-2xl border-red-100">
-                <div class="absolute -top-4 left-6 bg-[var(--heineken-red)] text-white text-[10px] px-3 py-1 rounded-full font-bold haccp-pulse">HACCP STRICT</div>
+            <!-- 02: Soutirage -->
+            <div class="node-card p-6 rounded-xl border-red-50" onclick="openModal('modal-soutireuse')">
+                <div class="absolute -top-3 left-6 bg-[var(--heineken-red)] text-white text-[9px] px-3 py-1 rounded-full font-black haccp-pulse">HACCP CRITIQUE</div>
                 <span class="node-number">02</span>
-                <h2 class="text-xl font-bold mb-4 uppercase tracking-tight">Soutireuse G8 / G9</h2>
-                <div class="svg-icon">
-                    <svg viewBox="0 0 100 100">
-                        <path d="M30 20 V80 M50 20 V80 M70 20 V80" stroke-width="4" stroke-opacity="0.2" />
-                        <circle cx="30" cy="50" r="8" fill="var(--heineken-green)" />
-                        <circle cx="50" cy="40" r="8" fill="var(--heineken-green)" />
-                        <circle cx="70" cy="60" r="8" fill="var(--heineken-green)" />
+                <h3 class="font-black text-lg mb-2 uppercase">Soutireuse</h3>
+                <p class="text-xs text-gray-500 leading-relaxed mb-4">Bloc Rinçage / Soutirage / Bouchage. Cadence G8: 63k bt/h.</p>
+                <div class="flex items-center justify-center py-4">
+                    <svg width="80" height="80" viewBox="0 0 100 100" fill="none" stroke="var(--heineken-green)" stroke-width="2">
+                        <circle cx="50" cy="50" r="35" stroke-dasharray="5 5"/>
+                        <circle cx="50" cy="50" r="15" fill="var(--heineken-green)" opacity="0.2"/>
+                        <path d="M50 10 V30 M50 70 V90 M10 50 H30 M70 50 H90"/>
                     </svg>
                 </div>
-                <div class="flex justify-between text-xs font-bold mb-4">
-                    <div class="text-gray-400">G8: <span class="text-black">63 000 b/h</span></div>
-                    <div class="text-gray-400">G9: <span class="text-black">40 000 b/h</span></div>
-                </div>
-                <button class="btn-desc" onclick="openModal('desc-soutireuse')">DESCRIPTION</button>
+                <div class="mt-2 text-[10px] font-bold text-[var(--heineken-red)] uppercase tracking-widest">Voir détails →</div>
             </div>
 
-            <div class="node-card p-8 rounded-2xl">
+            <!-- 03: Pasteurisation -->
+            <div class="node-card p-6 rounded-xl" onclick="openModal('modal-pasto')">
                 <span class="node-number">03</span>
-                <h2 class="text-xl font-bold mb-4 uppercase tracking-tight">Étiqueteuse</h2>
-                <div class="svg-icon">
-                    <svg viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="30" />
-                        <path d="M20 50 H80" class="flow-path" />
-                        <rect x="40" y="40" width="20" height="20" fill="var(--heineken-green)" opacity="0.5" />
+                <h3 class="font-black text-lg mb-2 uppercase">Pasteurisation</h3>
+                <p class="text-xs text-gray-500 leading-relaxed mb-4">Tunnel thermique pour stabilité biologique du produit.</p>
+                <div class="flex items-center justify-center py-4">
+                    <svg width="80" height="80" viewBox="0 0 100 100" fill="none" stroke="var(--heineken-green)" stroke-width="2">
+                        <rect x="10" y="30" width="80" height="40" rx="4"/>
+                        <path d="M20 40 Q50 20 80 40" stroke="orange" stroke-width="3" opacity="0.5"/>
+                        <path d="M20 60 Q50 80 80 60" stroke="blue" stroke-width="3" opacity="0.5"/>
                     </svg>
                 </div>
-                <p class="text-xs text-gray-500 mb-4 font-mono uppercase">CL A | CL B | CL C | 742</p>
-                <button class="btn-desc" onclick="openModal('desc-etiqueteuse')">DESCRIPTION</button>
+                <div class="mt-2 text-[10px] font-bold text-[var(--heineken-green)] uppercase tracking-widest">Voir détails →</div>
             </div>
 
-            <div class="node-card p-8 rounded-2xl">
+            <!-- 04: Étiquetage -->
+            <div class="node-card p-6 rounded-xl" onclick="openModal('modal-etiqueteuse')">
                 <span class="node-number">04</span>
-                <h2 class="text-xl font-bold mb-4 uppercase tracking-tight">Machine à Packs (MAP)</h2>
-                <div class="svg-icon">
-                    <svg viewBox="0 0 100 100">
-                        <rect x="25" y="25" width="20" height="20" />
-                        <rect x="55" y="25" width="20" height="20" />
-                        <rect x="25" y="55" width="20" height="20" />
-                        <rect x="55" y="55" width="20" height="20" />
-                        <path d="M20 20 L80 80" stroke-opacity="0.3" />
+                <h3 class="font-black text-lg mb-2 uppercase">Étiqueteuse</h3>
+                <p class="text-xs text-gray-500 leading-relaxed mb-4">Habillage CLA/B/C/D & 742. Précision millimétrique.</p>
+                <div class="flex items-center justify-center py-4">
+                    <svg width="80" height="80" viewBox="0 0 100 100" fill="none" stroke="var(--heineken-green)" stroke-width="2">
+                        <circle cx="50" cy="50" r="25"/>
+                        <rect x="40" y="40" width="20" height="20" stroke="var(--heineken-red)" fill="var(--heineken-red)" fill-opacity="0.1"/>
+                        <path d="M10 50 H30 M70 50 H90"/>
                     </svg>
                 </div>
-                <p class="text-xs text-gray-500 mb-4">Parker/Cermex | QF1/DUO1 | OCME</p>
-                <button class="btn-desc" onclick="openModal('desc-map')">DESCRIPTION</button>
+                <div class="mt-2 text-[10px] font-bold text-[var(--heineken-green)] uppercase tracking-widest">Voir détails →</div>
             </div>
 
-            <div class="node-card p-8 rounded-2xl">
+            <!-- 05: MAP -->
+            <div class="node-card p-6 rounded-xl" onclick="openModal('modal-map')">
                 <span class="node-number">05</span>
-                <h2 class="text-xl font-bold mb-4 uppercase tracking-tight">Palettisation</h2>
-                <div class="svg-icon">
-                    <svg viewBox="0 0 100 100">
-                        <path d="M20 80 H80 M20 70 H80 M20 60 H80" stroke-width="2" />
-                        <rect x="35" y="30" width="30" height="30" fill="var(--heineken-green)" />
+                <h3 class="font-black text-lg mb-2 uppercase">Mise en Packs</h3>
+                <p class="text-xs text-gray-500 leading-relaxed mb-4">Cermex/Parker & OCME. Formation cartons et fardelage.</p>
+                <div class="flex items-center justify-center py-4">
+                    <svg width="80" height="80" viewBox="0 0 100 100" fill="none" stroke="var(--heineken-green)" stroke-width="2">
+                        <rect x="20" y="30" width="25" height="40" rx="2"/>
+                        <rect x="55" y="30" width="25" height="40" rx="2"/>
+                        <path d="M45 50 H55" stroke-dasharray="2 2"/>
                     </svg>
                 </div>
-                <div class="flex gap-2 mb-4 text-[10px] font-bold">
-                    <span class="bg-gray-100 px-2 py-1">PAL P1</span>
-                    <span class="bg-gray-100 px-2 py-1">PAL P2</span>
-                    <span class="bg-gray-100 px-2 py-1">PAL P3</span>
-                </div>
-                <button class="btn-desc" onclick="openModal('desc-pal')">DESCRIPTION</button>
+                <div class="mt-2 text-[10px] font-bold text-[var(--heineken-green)] uppercase tracking-widest">Voir détails →</div>
             </div>
 
-            <div class="node-card p-8 rounded-2xl">
+            <!-- 06: Palettisation -->
+            <div class="node-card p-6 rounded-xl" onclick="openModal('modal-pal')">
                 <span class="node-number">06</span>
-                <h2 class="text-xl font-bold mb-4 uppercase tracking-tight">MSK (Finalisation)</h2>
-                <div class="svg-icon">
-                    <svg viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="40" stroke-dasharray="5 5" class="flow-path" />
-                        <rect x="40" y="40" width="20" height="20" />
+                <h3 class="font-black text-lg mb-2 uppercase">Palettisation</h3>
+                <p class="text-xs text-gray-500 leading-relaxed mb-4">Groupage robotisé par pinces et envoi vers MSK.</p>
+                <div class="flex items-center justify-center py-4">
+                    <svg width="80" height="80" viewBox="0 0 100 100" fill="none" stroke="var(--heineken-green)" stroke-width="2">
+                        <path d="M30 20 V60 M70 20 V60 M30 30 H70" stroke-width="3"/>
+                        <rect x="35" y="60" width="30" height="10" fill="var(--heineken-green)" fill-opacity="0.3"/>
+                        <path d="M20 70 H80" stroke-width="4"/>
                     </svg>
                 </div>
-                <p class="text-xs text-gray-500 mb-4 font-bold">Houssage & Banderolage</p>
-                <button class="btn-desc" onclick="openModal('desc-msk')">DESCRIPTION</button>
+                <div class="mt-2 text-[10px] font-bold text-[var(--heineken-green)] uppercase tracking-widest">Voir détails →</div>
             </div>
-
-            <div class="node-card p-8 rounded-2xl bg-[var(--heineken-green)] border-none">
-                <span class="node-number text-white opacity-10">07</span>
-                <h2 class="text-xl font-bold mb-4 uppercase tracking-tight text-white italic">Zone Logistique</h2>
-                <div class="svg-icon">
-                    <svg viewBox="0 0 100 100" stroke="white">
-                        <path d="M20 80 L40 80 L45 60 L80 60" fill="none" stroke-width="3" />
-                        <circle cx="30" cy="85" r="5" fill="white" />
-                        <circle cx="60" cy="85" r="5" fill="white" />
-                    </svg>
-                </div>
-                <p class="text-xs text-green-100 mb-4">Transfert Cariste vers stockage final.</p>
-                <button class="btn-desc bg-white !text-[var(--heineken-green)]" onclick="openModal('desc-cariste')">DÉTAILS FLUX</button>
-            </div>
-
         </div>
     </main>
 
-    <div id="desc-depal" class="modal" onclick="closeModal(event)">
-        <div class="modal-content">
-            <h3 class="text-2xl font-black mb-4 uppercase">Détails : Dépalettisation</h3>
-            <div class="grid grid-cols-2 gap-8 text-sm leading-relaxed">
-                <div>
-                    <h4 class="font-bold text-[var(--heineken-green)] uppercase mb-2">Opérations G8/G9</h4>
+    <!-- MODAL DÉPALETTISATION -->
+    <div id="modal-depal" class="modal">
+        <div class="modal-content flex flex-col md:flex-row h-full">
+            <div class="p-8 md:w-2/3 relative">
+                <span class="btn-close" onclick="closeModal('modal-depal')">&times;</span>
+                <h2 class="text-3xl font-black mb-6 text-[var(--heineken-green)] italic">DÉPALETTISATION G8/G9</h2>
+                <div class="space-y-4 text-sm leading-relaxed text-gray-700">
+                    <p>L'entrée de ligne commence par le flux de bouteilles neuves en provenance de la verrerie.</p>
+                    <div class="bg-gray-50 p-4 border-l-4 border-[var(--heineken-red)]">
+                        <h4 class="font-black text-xs uppercase mb-1">Étape critique : Déhoussage manuel</h4>
+                        <p>L'opérateur utilise un <strong>cutter de sécurité</strong> pour déchirer et retirer la couverture plastique protectrice de la palette. Cette opération requiert une vigilance accrue pour éviter toute coupure ou chute de verre.</p>
+                    </div>
                     <ul class="list-disc pl-5 space-y-2">
-                        <li><strong>Retrait de housse :</strong> Automatisé, préparation de la palette pleine.</li>
-                        <li><strong>Mise sur convoyeur :</strong> Injection des bouteilles vides vers la ligne.</li>
-                        <li><strong>Gestion Akilux :</strong> Retrait et empilage des intercalaires plastiques.</li>
+                        <li><strong>Retrait des Akilux :</strong> Le dépalettiseur automatique lève les bouteilles étage par étage. Un bras robotisé retire les plaques <strong>Akilux</strong> (intercalaires plastiques) pour les empiler.</li>
+                        <li><strong>Alimentation tapis :</strong> Les bouteilles sont dirigées vers les convoyeurs d'accumulation pour assurer une alimentation constante de la soutireuse.</li>
                     </ul>
                 </div>
-                <div class="bg-gray-50 p-4 border rounded">
-                    <p class="italic text-gray-500 font-medium">Note : Assurer la fluidité du convoyeur pour éviter les ruptures de charge en soutireuse.</p>
-                </div>
+            </div>
+            <div class="md:w-1/3 machine-drawing p-6">
+                <!-- SCHÉMA TECHNIQUE DÉPAL -->
+                <svg width="100%" height="300" viewBox="0 0 200 300" fill="none">
+                    <rect x="40" y="200" width="120" height="80" stroke="#ccc" stroke-width="2"/>
+                    <rect x="50" y="210" width="100" height="60" fill="#e2e8f0"/>
+                    <path d="M30 150 L170 150" stroke="#008200" stroke-width="4" stroke-dasharray="8 4"/>
+                    <path d="M100 50 V150" stroke="#E30613" stroke-width="2"/>
+                    <path d="M80 70 L100 50 L120 70" stroke="#E30613" stroke-width="2"/>
+                    <text x="100" y="40" text-anchor="middle" font-size="10" font-weight="bold" fill="#E30613">BRAS AKILUX</text>
+                    <text x="100" y="290" text-anchor="middle" font-size="8" fill="#999">PALETTE EN DÉCHARGE</text>
+                </svg>
             </div>
         </div>
     </div>
 
-    <div id="desc-soutireuse" class="modal" onclick="closeModal(event)">
-        <div class="modal-content">
-            <h3 class="text-2xl font-black mb-4 uppercase text-[var(--heineken-red)]">Point Critique : Soutireuse</h3>
-            <p class="mb-6 font-bold uppercase text-xs tracking-widest text-gray-400">Cadence nominale : G8 63k | G9 40k</p>
-            <div class="grid grid-cols-3 gap-4">
-                <div class="p-4 bg-blue-50 border-t-4 border-blue-500">
-                    <span class="font-black text-blue-800">01. RINÇAGE</span>
-                    <p class="text-xs mt-2">Élimination des impuretés internes bouteilles.</p>
-                </div>
-                <div class="p-4 bg-yellow-50 border-t-4 border-yellow-600">
-                    <span class="font-black text-yellow-800">02. REMPLISSAGE</span>
-                    <p class="text-xs mt-2">Dosage haute précision sous atmosphère contrôlée.</p>
-                </div>
-                <div class="p-4 bg-gray-50 border-t-4 border-gray-800">
-                    <span class="font-black text-gray-800">03. BOUCHAGE</span>
-                    <p class="text-xs mt-2">Sertissage et étanchéité immédiate.</p>
-                </div>
-            </div>
-            <p class="mt-6 text-sm text-red-600 font-bold border-l-4 border-red-600 pl-4">ZONAGE HACCP : Hygiène stricte, contrôle microbiologique permanent.</p>
-        </div>
-    </div>
-
-    <div id="desc-etiqueteuse" class="modal" onclick="closeModal(event)">
-        <div class="modal-content">
-            <h3 class="text-2xl font-black mb-4 uppercase">Habillage : Étiqueteuses</h3>
-            <div class="space-y-4">
-                <div class="flex items-center gap-4 border-b pb-4">
-                    <div class="w-20 h-20 bg-green-50 rounded flex items-center justify-center font-bold text-[var(--heineken-green)]">742</div>
-                    <div>
-                        <p class="font-bold">Modèle de pointe 742</p>
-                        <p class="text-sm text-gray-500">Vient en complément des séries Clear Label (A, B, C) pour un habillage multiposte.</p>
+    <!-- MODAL SOUTIREUSE -->
+    <div id="modal-soutireuse" class="modal">
+        <div class="modal-content flex flex-col md:flex-row">
+            <div class="p-8 md:w-2/3 relative">
+                <span class="btn-close" onclick="closeModal('modal-soutireuse')">&times;</span>
+                <h2 class="text-3xl font-black mb-6 text-[var(--heineken-red)] italic">SOUTIREUSE ISOBARE</h2>
+                <div class="space-y-4 text-sm leading-relaxed text-gray-700">
+                    <div class="flex gap-4 mb-4 font-bold text-[10px] uppercase italic">
+                        <span class="bg-gray-100 px-3 py-1">G8 : 63 000 bt/h</span>
+                        <span class="bg-gray-100 px-3 py-1">G9 : 40 000 bt/h</span>
                     </div>
+                    <p>Point névralgique du conditionnement. La machine intègre trois fonctions critiques :</p>
+                    <ol class="list-decimal pl-5 space-y-3">
+                        <li><strong>Rinçage :</strong> Injection d'eau stérile pour l'hygiène interne.</li>
+                        <li><strong>Soutirage :</strong> Remplissage sous contre-pression pour conserver le CO₂ et éviter l'oxydation.</li>
+                        <li><strong>Bouchage :</strong> Pose et sertissage immédiat de la capsule couronne.</li>
+                    </ol>
+                    <p class="text-xs font-bold text-[var(--heineken-red)] mt-4">★ HACCP : Contrôle microbiologique strict requis.</p>
                 </div>
-                <p class="text-sm">Gestion des collerettes, étiquettes corps et contre-étiquettes avec une précision au millimètre.</p>
+            </div>
+            <div class="md:w-1/3 machine-drawing p-6">
+                <svg width="100%" height="300" viewBox="0 0 200 300" fill="none">
+                    <circle cx="100" cy="150" r="70" stroke="#008200" stroke-width="8" stroke-dasharray="10 5"/>
+                    <circle cx="100" cy="150" r="30" stroke="#ccc" stroke-width="2"/>
+                    <path d="M100 80 V120" stroke="#E30613" stroke-width="3"/>
+                    <circle cx="100" cy="70" r="5" fill="#E30613"/>
+                    <text x="100" y="250" text-anchor="middle" font-size="10" font-weight="bold" fill="#008200">CARROUSEL ROTATIF</text>
+                </svg>
             </div>
         </div>
     </div>
 
-    <div id="desc-map" class="modal" onclick="closeModal(event)">
-        <div class="modal-content">
-            <h3 class="text-2xl font-black mb-4 uppercase">Groupage : Machine à Packs</h3>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="border p-4">
-                    <h5 class="font-black text-[var(--heineken-green)]">TECHNOLOGIE 01</h5>
-                    <p class="text-xs uppercase">Parker / Cermex</p>
+    <!-- MODAL PASTO -->
+    <div id="modal-pasto" class="modal">
+        <div class="modal-content flex flex-col md:flex-row">
+            <div class="p-8 md:w-2/3 relative">
+                <span class="btn-close" onclick="closeModal('modal-pasto')">&times;</span>
+                <h2 class="text-3xl font-black mb-6 text-orange-600 italic">PASTEURISATEUR TUNNEL</h2>
+                <div class="space-y-4 text-sm leading-relaxed text-gray-700">
+                    <p>La bière bouchée traverse un tunnel de pasteurisation pour stabiliser le produit biologiquement.</p>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Traitement Thermique :</strong> Montée progressive en température jusqu'au palier de pasteurisation (UP - Unités de Pasteurisation).</li>
+                        <li><strong>Refroidissement :</strong> Douches d'eau successives pour ramener la bière à température ambiante avant l'étiquetage.</li>
+                    </ul>
                 </div>
-                <div class="border p-4">
-                    <h5 class="font-black text-[var(--heineken-green)]">TECHNOLOGIE 02</h5>
-                    <p class="text-xs uppercase">QF1 / DUO1</p>
-                </div>
-                <div class="border p-4 col-span-2 text-center bg-gray-900 text-white">
-                    <h5 class="font-black">STANDARD OCME</h5>
-                    <p class="text-xs uppercase tracking-widest">Formation de cartons et fardelage haute cadence.</p>
-                </div>
+            </div>
+            <div class="md:w-1/3 machine-drawing p-6">
+                <svg width="100%" height="200" viewBox="0 0 200 200" fill="none">
+                    <rect x="20" y="80" width="160" height="40" stroke="#ccc" stroke-width="2" rx="5"/>
+                    <path d="M40 70 Q100 30 160 70" stroke="orange" stroke-width="2" stroke-dasharray="4 4"/>
+                    <path d="M40 130 Q100 170 160 130" stroke="blue" stroke-width="2" stroke-dasharray="4 4"/>
+                </svg>
             </div>
         </div>
     </div>
 
-    <div id="desc-msk" class="modal" onclick="closeModal(event)">
-        <div class="modal-content">
-            <h3 class="text-2xl font-black mb-4 uppercase">MSK : Stabilisation Palette</h3>
-            <div class="space-y-6">
-                <div class="flex gap-4">
-                    <div class="bg-blue-600 text-white p-4 font-bold rounded">HOUSSAGE</div>
-                    <div class="bg-green-600 text-white p-4 font-bold rounded">BANDEROLEUSE</div>
+    <!-- MODAL ÉTIQUETEUSE -->
+    <div id="modal-etiqueteuse" class="modal">
+        <div class="modal-content flex flex-col md:flex-row">
+            <div class="p-8 md:w-2/3 relative">
+                <span class="btn-close" onclick="closeModal('modal-etiqueteuse')">&times;</span>
+                <h2 class="text-3xl font-black mb-6 text-[var(--heineken-green)] italic">ÉTIQUETAGE HAUTE PRÉCISION</h2>
+                <div class="space-y-4 text-sm leading-relaxed text-gray-700">
+                    <p>Le site opère plusieurs groupes d'étiquetage selon la complexité du design :</p>
+                    <ul class="list-disc pl-5 space-y-2 font-bold">
+                        <li>Groupe G8/9 : CLA, CLB, CLC et la 742.</li>
+                        <li>Groupe G13 : CLD.</li>
+                    </ul>
+                    <p>Pose précise de l'étiquette corps, de la collerette et de la contre-étiquette. Système de vision intégré pour rejet automatique des défauts de pose.</p>
                 </div>
-                <p class="text-sm">Le système MSK assure l'intégrité de la palette durant le transport. Le houssage protège contre l'humidité tandis que la banderoleuse assure le maintien mécanique des couches.</p>
+            </div>
+            <div class="md:w-1/3 machine-drawing p-6">
+                <svg width="100%" height="300" viewBox="0 0 200 300" fill="none">
+                    <path d="M100 50 V250" stroke="#ccc" stroke-width="2"/>
+                    <rect x="80" y="100" width="40" height="80" rx="5" stroke="#008200" stroke-width="3"/>
+                    <rect x="120" y="130" width="30" height="20" fill="#E30613" opacity="0.5"/>
+                    <text x="135" y="120" text-anchor="middle" font-size="8" fill="#E30613">STATION POSE</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL MAP -->
+    <div id="modal-map" class="modal">
+        <div class="modal-content flex flex-col md:flex-row">
+            <div class="p-8 md:w-2/3 relative">
+                <span class="btn-close" onclick="closeModal('modal-map')">&times;</span>
+                <h2 class="text-3xl font-black mb-6 text-[var(--heineken-green)] italic">MACHINES À PACKS (MAP)</h2>
+                <div class="space-y-4 text-sm leading-relaxed text-gray-700">
+                    <p>Formation des unités de vente consommateur (packs de 6, 12 ou 24).</p>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Cermex / Parker :</strong> Système de formage carton et encaissage par le haut.</li>
+                        <li><strong>DUO1 / OCME :</strong> Ligne de fardelage (film rétractable) pour les packs promotionnels et formats spécifiques.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="md:w-1/3 machine-drawing p-6">
+                <svg width="100%" height="200" viewBox="0 0 200 200" fill="none">
+                    <rect x="40" y="60" width="50" height="80" stroke="#008200" stroke-width="2"/>
+                    <rect x="110" y="60" width="50" height="80" stroke="#008200" stroke-width="2"/>
+                    <path d="M90 100 L110 100" stroke="#ccc" stroke-width="2"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PALETISATION -->
+    <div id="modal-pal" class="modal">
+        <div class="modal-content flex flex-col md:flex-row">
+            <div class="p-8 md:w-2/3 relative">
+                <span class="btn-close" onclick="closeModal('modal-pal')">&times;</span>
+                <h2 class="text-3xl font-black mb-6 text-[var(--heineken-green)] italic">PALETTISATION ROBOTISÉE</h2>
+                <div class="space-y-4 text-sm leading-relaxed text-gray-700">
+                    <p>Le site dispose de trois lignes de palettisation (PAL 1, PAL 2, PAL 3).</p>
+                    <div class="bg-green-50 p-4 border-l-4 border-[var(--heineken-green)]">
+                        <h4 class="font-black text-xs uppercase mb-1">Système de préhension par pinces</h4>
+                        <p>Des <strong>pinces robotisées</strong> assemblent les packs de bouteilles par couches. Elles les déposent avec précision sur la palette bois.</p>
+                    </div>
+                    <ul class="list-disc pl-5 space-y-2 mt-4">
+                        <li><strong>Intercalaires :</strong> Un distributeur automatique insère des intercalaires entre les couches pour assurer la stabilité mécanique de l'ensemble.</li>
+                        <li><strong>Évacuation MSK :</strong> Une fois la pile terminée, la palette est évacuée via des convoyeurs vers la zone <strong>MSK</strong> pour le houssage et le banderolage final.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="md:w-1/3 machine-drawing p-6">
+                <svg width="100%" height="300" viewBox="0 0 200 300" fill="none">
+                    <!-- ROBOT PAL -->
+                    <path d="M40 250 H160" stroke="#333" stroke-width="4"/>
+                    <rect x="60" y="200" width="80" height="50" fill="#eee" stroke="#ccc"/>
+                    <path d="M100 50 V180" stroke="#008200" stroke-width="4"/>
+                    <path d="M70 180 H130" stroke="#008200" stroke-width="6"/>
+                    <path d="M70 180 V200 M130 180 V200" stroke="#008200" stroke-width="3"/>
+                    <text x="100" y="40" text-anchor="middle" font-size="10" font-weight="bold" fill="#008200">PINCES DE PRÉHENSION</text>
+                    <text x="100" y="230" text-anchor="middle" font-size="9" fill="#666">FORMATION COUCHE</text>
+                </svg>
             </div>
         </div>
     </div>
 
     <footer class="mt-20 border-t border-gray-100 py-10 text-center">
-        <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.5em]">Engineering Standards - 2026 Process Document</p>
+        <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.5em]">Engineering Standards & Continuous Improvement - 2026</p>
     </footer>
 
     <script>
         function openModal(id) {
             document.getElementById(id).style.display = "block";
+            document.body.style.overflow = "hidden"; // Stop scroll
         }
 
-        function closeModal(event) {
-            if (event.target.className === "modal" || event.target.className === "modal-content") {
-                const modals = document.getElementsByClassName("modal");
-                for (let i = 0; i < modals.length; i++) {
-                    modals[i].style.display = "none";
-                }
-            }
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+            document.body.style.overflow = "auto"; // Resume scroll
         }
 
-        // Fermeture automatique au clic en dehors
         window.onclick = function(event) {
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = "none";
+                document.body.style.overflow = "auto";
             }
         }
     </script>
